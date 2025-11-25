@@ -1,0 +1,9 @@
+drivers/power/supply/qcom/smb5-lib.c
+drivers/power/supply/qcom/smb5-lib.h
+drivers/power/supply/qcom/smb5-reg.h
+drivers/power/supply/qcom/qpnp-smb5.c
+
+techpack/audio/Makefile
+techpack/audio/config/sm6150auto.conf
+
+
