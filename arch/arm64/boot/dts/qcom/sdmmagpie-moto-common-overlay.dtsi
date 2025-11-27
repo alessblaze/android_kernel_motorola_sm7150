@@ -34,12 +34,11 @@
 &reserved_memory {
 	ramoops_mem {
 		compatible = "ramoops";
-		no-map;
 		reg = <0x0 RAMOOPS_BASE_ADDR 0x0 RAMOOPS_SIZE>;
 		console-size = <RAMOOPS_CONSOLE_SIZE>;
 		pmsg-size = <RAMOOPS_PMSG_SIZE>;
 		record-size = <RAMOOPS_RECORD_SIZE>;
-		no-dump-oops;
+		max-reason = <4>;
 	};
 
 	wdog_cpuctx_mem: wdog_cpuctx_region {
