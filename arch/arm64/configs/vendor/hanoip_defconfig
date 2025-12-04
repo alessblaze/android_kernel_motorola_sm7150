@@ -726,12 +726,9 @@ CONFIG_CRYPTO_GHASH_ARM64_CE=y
 CONFIG_CRYPTO_AES_ARM64_CE_CCM=y
 CONFIG_CRYPTO_AES_ARM64_CE_BLK=y
 CONFIG_CRYPTO_AES_ARM64_NEON_BLK=y
-<<<<<<< HEAD:arch/arm64/configs/vendor/hanoip_defconfig
 CONFIG_STACK_HASH_ORDER_SHIFT=12
 CONFIG_KPROBES=y
 CONFIG_HAVE_KPROBES=y
 CONFIG_KPROBE_EVENTS=y
 # KernelSU
-CONFIG_KSU=y
-=======
->>>>>>> upstream/lineage-20:arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
+#CONFIG_KSU=y
