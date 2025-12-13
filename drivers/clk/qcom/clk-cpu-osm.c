@@ -698,6 +698,40 @@ static int osm_cpufreq_cpu_init(struct cpufreq_policy *policy)
 		pr_err("%s: invalid frequency table: %d\n", __func__, ret);
 		goto err;
 	}
+    // Fragile code. capping max frequency for perf cluster
+	if (parent->cluster_num == 2) {           /* perf cluster */
+    	unsigned int cap_khz = 2169600;       /* must exist in table */
+
+    if (policy->max > cap_khz)
+        policy->max = cap_khz;
+
+    if (policy->cpuinfo.max_freq > cap_khz)
+        policy->cpuinfo.max_freq = cap_khz;
+
+    if (policy->min > policy->max)
+        policy->min = policy->max;
+
+    if (policy->cur > policy->max)
+        policy->cur = policy->max;
+	}	
+
+	    // Fragile code. capping max frequency for lil cluster
+	if (parent->cluster_num == 1) {           /* lil cluster */
+    	unsigned int cap_khz = 1612800;       /* must exist in table */
+
+    if (policy->max > cap_khz)
+        policy->max = cap_khz;
+
+    if (policy->cpuinfo.max_freq > cap_khz)
+        policy->cpuinfo.max_freq = cap_khz;
+
+    if (policy->min > policy->max)
+        policy->min = policy->max;
+
+    if (policy->cur > policy->max)
+        policy->cur = policy->max;
+	}	
+
 
 	policy->dvfs_possible_from_any_cpu = true;
 	policy->fast_switch_possible = true;
