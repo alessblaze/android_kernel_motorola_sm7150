@@ -698,6 +698,19 @@ static int osm_cpufreq_cpu_init(struct cpufreq_policy *policy)
 		pr_err("%s: invalid frequency table: %d\n", __func__, ret);
 		goto err;
 	}
+	// So we have dynamic freq table set up registers in qcom, where it reads value from registers
+	// and sets frequency accordingly. However, we want to cap max frequency for clusters
+	// Why? we have noticed some heat on long calls, which seems to be related to a higher
+	// frequency, which is common for heavy workloads, the higher voltage/frequency, even
+	// on lower NM nodes where FET wastes more energy, hereby ultimate latency is unnoticable
+	// to the user but the GAAFET or FinFET structure wastes more energy thus it heats up more.
+	// https://www.ece.ucdavis.edu/~ramirtha/EEC216/W08/lecture1_updated.pdf
+	// https://group.iiis.tsinghua.edu.cn/~maks/publications/pdf/Key-Characterization.pdf
+	// so here we cap max frequency for perf and lil clusters
+	// we cannot just set any cap. the cap/voltage combo must exist in table otherwise it may
+	// have issues.
+
+
     // Fragile code. capping max frequency for perf cluster
 	if (parent->cluster_num == 2) {           /* perf cluster */
     	unsigned int cap_khz = 2169600;       /* must exist in table */
