@@ -1170,15 +1170,9 @@ static int arm_smmu_init_l2_strtab(struct arm_smmu_device *smmu, u32 sid)
 	size_t size;
 	void *strtab;
 	struct arm_smmu_strtab_cfg *cfg = &smmu->strtab_cfg;
-	struct arm_smmu_strtab_l1_desc *desc;
-	u32 l1_idx = sid >> STRTAB_SPLIT;  // Calculate and declare the index
-	
-	if (l1_idx >= cfg->num_l1_ents)    // Validate before use
-		return -EINVAL;
-	
-	desc = &cfg->l1_desc[l1_idx];      // Safe access
-        
-        if (desc->l2ptr)                    // ADD THIS CHECK BACK
+	struct arm_smmu_strtab_l1_desc *desc = &cfg->l1_desc[sid >> STRTAB_SPLIT];
+
+	if (desc->l2ptr)
 		return 0;
 
 	size = 1 << (STRTAB_SPLIT + ilog2(STRTAB_STE_DWORDS) + 3);
@@ -1647,20 +1641,12 @@ static __le64 *arm_smmu_get_step_for_sid(struct arm_smmu_device *smmu, u32 sid)
 		int idx;
 
 		/* Two-level walk */
-		// ADD THIS CHECK:
-		if ((sid >> STRTAB_SPLIT) >= cfg->num_l1_ents)
-			return NULL;
-		
 		idx = (sid >> STRTAB_SPLIT) * STRTAB_L1_DESC_DWORDS;
 		l1_desc = &cfg->l1_desc[idx];
 		idx = (sid & ((1 << STRTAB_SPLIT) - 1)) * STRTAB_STE_DWORDS;
 		step = &l1_desc->l2ptr[idx];
 	} else {
 		/* Simple linear lookup */
-		// ADD THIS CHECK:
-		if (sid >= cfg->num_l1_ents)
-			return NULL;
-		
 		step = &cfg->strtab[sid * STRTAB_STE_DWORDS];
 	}
 
