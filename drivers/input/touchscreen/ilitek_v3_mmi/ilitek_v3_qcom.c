@@ -458,9 +458,65 @@ int ili_sysfs_remove_device(struct device *dev) {
 
 	return 0;
 }
+
 #else
 
+
 #if defined(CONFIG_FB) || defined(CONFIG_DRM_MSM)
+#if defined(ILI_SYSFS_NODES)
+
+static ssize_t tap_gesture_pressed_show(struct device *dev,
+                                        struct device_attribute *attr,
+                                        char *buf)
+{
+    return scnprintf(buf, PAGE_SIZE, "%d\n", atomic_read(&ilits->tap_gesture_seq));
+}
+
+static DEVICE_ATTR_RO(tap_gesture_pressed);
+
+
+static struct attribute *ilitek_dev_tap_gesture_pressed_atts[] = {
+    &dev_attr_tap_gesture_pressed.attr,
+    NULL
+};
+
+static const struct attribute_group ilitek_dev_tap_gesture_pressed_atts_group = {
+    .attrs = ilitek_dev_tap_gesture_pressed_atts,
+};
+
+static const struct attribute_group *ilitek_dev_attr_groups[] = {
+	&ilitek_dev_tap_gesture_pressed_atts_group,
+	NULL
+};
+
+int ili_sysfs_add_device(struct device *dev) {
+	int ret = 0, i;
+
+	for (i = 0; ilitek_dev_attr_groups[i]; i++) {
+		ret = sysfs_create_group(&dev->kobj, ilitek_dev_attr_groups[i]);
+		if (ret) {
+			while (--i >= 0) {
+				sysfs_remove_group(&dev->kobj, ilitek_dev_attr_groups[i]);
+			}
+			break;
+		}
+	}
+
+	return ret;
+}
+
+int ili_sysfs_remove_device(struct device *dev) {
+	int i;
+
+	sysfs_remove_link(NULL, "touchscreen");
+	for (i = 0; ilitek_dev_attr_groups[i]; i++) {
+		sysfs_remove_group(&dev->kobj, ilitek_dev_attr_groups[i]);
+	}
+
+	return 0;
+}
+#endif
+
 static int ilitek_plat_notifier_fb(struct notifier_block *self, unsigned long event, void *data)
 {
 	int *blank;
@@ -729,6 +785,7 @@ static void ilitek_plat_sleep_init(void)
 #endif
 }
 #endif
+
 #if CHARGER_NOTIFIER_CALLBACK
 #if KERNEL_VERSION(4, 1, 0) <= LINUX_VERSION_CODE
 /* add_for_charger_start */
@@ -818,12 +875,19 @@ static int ilitek_plat_probe(void)
 		return -ENODEV;
 	}
 #if SPRD_SYSFS_SUSPEND_RESUME
-	ili_sysfs_add_device(ilits->dev);
-	if (sysfs_create_link(NULL, &ilits->dev->kobj, "touchscreen") < 0)
-		ILI_INFO("Failed to create link!\n");
+    ili_sysfs_add_device(ilits->dev);
+    if (sysfs_create_link(NULL, &ilits->dev->kobj, "touchscreen") < 0)
+        ILI_INFO("Failed to create link!\n");
+#elif defined(ILI_SYSFS_NODES)
+    atomic_set(&ilits->tap_gesture_seq, 0);
+    ili_sysfs_add_device(ilits->dev);
+    if (sysfs_create_link(NULL, &ilits->dev->kobj, "touchscreen") < 0)
+        ILI_INFO("Failed to create link!\n");
+    ilitek_plat_sleep_init();
 #else
-	ilitek_plat_sleep_init();
+    ilitek_plat_sleep_init();
 #endif
+
 	ilits->pm_suspend = false;
 	init_completion(&ilits->pm_completion);
 #ifdef ILI_SENSOR_EN
@@ -870,7 +934,7 @@ static int ilitek_tp_pm_resume(struct device *dev)
 static int ilitek_plat_remove(void)
 {
 	ILI_INFO("remove plat dev\n");
-#if SPRD_SYSFS_SUSPEND_RESUME
+#if SPRD_SYSFS_SUSPEND_RESUME || defined(ILI_SYSFS_NODES)
 	ili_sysfs_remove_device(ilits->dev);
 #endif
 	ili_dev_remove(ENABLE);

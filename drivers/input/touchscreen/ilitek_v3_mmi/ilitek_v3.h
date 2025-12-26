@@ -104,6 +104,7 @@
 #ifdef ILI_SENSOR_EN
 #include <linux/sensors.h>
 #include <linux/panel_notifier.h>
+#include <linux/atomic.h>
 #endif
 #ifdef ILI_CONFIG_PANEL_NOTIFICATIONS
 #include <linux/panel_notifier.h>
@@ -157,6 +158,7 @@
 #define I2C_DMA_TRANSFER		DISABLE
 #define SPI_DMA_TRANSFER_SPLIT		ENABLE
 #define SPRD_SYSFS_SUSPEND_RESUME	DISABLE
+#define ILI_SYSFS_NODES			ENABLE
 
 /* Path */
 #define DEBUG_DATA_FILE_SIZE		(10*K)
@@ -841,7 +843,9 @@ struct ilitek_ts_data {
 	struct gesture_coordinate *gcoord;
 	struct regulator *vdd;
 	struct regulator *vcc;
-
+#ifdef ILI_SYSFS_NODES
+	atomic_t tap_gesture_seq;
+#endif	
 #ifdef CONFIG_FB
 	struct notifier_block notifier_fb;
 #else
