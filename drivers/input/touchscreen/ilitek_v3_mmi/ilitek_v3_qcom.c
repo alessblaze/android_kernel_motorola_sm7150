@@ -556,8 +556,9 @@ static int ilitek_plat_notifier_fb(struct notifier_block *self, unsigned long ev
 			}
 			if (ili_sleep_handler(TP_DEEP_SLEEP) < 0)
 				ILI_ERR("TP suspend failed\n");
+			
 #ifdef ILI_SENSOR_EN
-			if (ilits->should_enable_gesture) {
+			if (READ_ONCE(ilits->should_enable_gesture)) {
 				ILI_INFO("double tap gesture suspend\n");
 				touch_set_state(TOUCH_LOW_POWER_STATE, TOUCH_PANEL_IDX_PRIMARY);
 				return 1;
@@ -622,6 +623,7 @@ static int ili_sensor_set_enable(struct sensors_classdev *sensors_cdev,
 	} else {
 		ILI_INFO("unknown enable symbol\n");
 	}
+	ILI_INFO("Gesture set enable %u by pid=%d comm=%s\n", enable, current->pid, current->comm);
 	mutex_unlock(&ilits->state_mutex);
 	return 0;
 }
@@ -649,7 +651,7 @@ static int ili_sensor_init(struct ilitek_ts_data *data)
 
 	if (data->report_gesture_key) {
 		__set_bit(EV_KEY, sensor_input_dev->evbit);
-		__set_bit(KEY_WAKEUP, sensor_input_dev->keybit);
+		__set_bit(KEY_F1, sensor_input_dev->keybit);
 	} else {
 		__set_bit(EV_ABS, sensor_input_dev->evbit);
 		input_set_abs_params(sensor_input_dev, ABS_DISTANCE,

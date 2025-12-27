@@ -1238,13 +1238,15 @@ void ili_report_gesture_mode(u8 *buf, int len)
 			return;
 		}
 		if (ilits->report_gesture_key) {
-			input_report_key(ilits->sensor_pdata->input_sensor_dev, KEY_WAKEUP, 1);
+			input_report_key(ilits->sensor_pdata->input_sensor_dev, KEY_F1, 1);
 			input_sync(ilits->sensor_pdata->input_sensor_dev);
-			input_report_key(ilits->sensor_pdata->input_sensor_dev, KEY_WAKEUP, 0);
+			input_report_key(ilits->sensor_pdata->input_sensor_dev, KEY_F1, 0);
 			input_sync(ilits->sensor_pdata->input_sensor_dev);
 			++report_cnt;
+#if defined(ILI_SYSFS_NODES)			
 			atomic_inc(&ilits->tap_gesture_seq);
 			sysfs_notify(&ilits->dev->kobj, NULL, "tap_gesture_pressed");
+#endif			
 		} else {
 			input_report_abs(ilits->sensor_pdata->input_sensor_dev,
 					ABS_DISTANCE,
