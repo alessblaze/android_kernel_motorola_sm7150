@@ -50,7 +50,11 @@ static struct sensors_classdev __maybe_unused sensors_touch_cdev = {
 	.flags = 1 | 6,
 	.fifo_reserved_event_count = 0,
 	.fifo_max_event_count = 0,
-	.enabled = 0,
+#if defined (ILI_SYSFS_NODES)	
+	.enabled = 1,
+#else   
+        .enabled = 0,
+#endif        	
 	.delay_msec = 200,
 	.sensors_enable = NULL,
 	.sensors_poll_delay = NULL,
