@@ -36,11 +36,17 @@ enum touch_state {
 
 #ifdef ILI_SENSOR_EN
 static struct sensors_classdev __maybe_unused sensors_touch_cdev = {
-
+#if defined (ILI_SYSFS_NODES)	
+	.name = "t2w-gesture",
+	.vendor = "ilitek",
+	.version = 1,
+	.type = SENSOR_TYPE_MOTO_TAP,
+#else
 	.name = "dt-gesture",
 	.vendor = "ilitek",
 	.version = 1,
 	.type = SENSOR_TYPE_MOTO_DOUBLE_TAP,
+#endif	
 	.max_range = "5.0",
 	.resolution = "5.0",
 	.sensor_power = "1",
