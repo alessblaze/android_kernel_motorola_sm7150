@@ -2,8 +2,10 @@
  * ILITEK Touch IC driver
  *
  * Copyright (C) 2011 ILI Technology Corporation.
+ * Copyright (C) 2025 Aless Microsystems
  *
  * Author: Dicky Chiang <dicky_chiang@ilitek.com>
+ * Editor: Albert Blasczykowski <albertalesso@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
